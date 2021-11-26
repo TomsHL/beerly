@@ -1,21 +1,35 @@
-from termcolor import colored
+from enum import Enum, unique
 
-from surprise import SVD, Dataset, Reader, dump
-from surprise.model_selection import cross_validate
+#from termcolor import colored
 
-from beerly.params import PATH, RATE
+#from surprise import SVD, Dataset, Reader, dump
+#from surprise.model_selection import cross_validate
+
+#from beerly.params import PATH_MODEL, RATINGS
+
+@unique
+class Atrib(Enum):
+    TASTE = 'taste'
+    APPEARANCE = 'appearance'
+    PALATE = 'palate'
+    AROMA = 'aroma'
+    OVERALL = 'overall'
+    
+    def val(self):
+        return self.value
 
 
 class Predictor(object):
-    def __init__(self, user, type_rate, beer_from_ocr):
+    def __init__(self, Atrib='overall'):
         """
             user: TO BE DEFINED
             type_rate : str : ratings to be used for pred / possible value : ['palate', 'overall', 'appearance', 'aroma', 'taste']
             beer_from_ocr = list : obtained from the OCR_Read class
         """
-        self.user = user
-        self.type_rate = type_rate
-        self.beer_from_ocr = beer_from_ocr
+        #self.user = user
+        #self.beer_from_ocr = beer_from_ocr
+        self.Atrib = Atrib
+
 
 
     def load_model(self, type_rate):
@@ -24,14 +38,15 @@ class Predictor(object):
             type_rate : str : ratings to be used for pred / possible value : ['palate', 'overall', 'appearance', 'aroma', 'taste']
         """
 
-        #add mean to select correct model from rating param
-        #FILE_NAME = RATE['rating']
+        #selection & loading of the correct model
+        FILE_NAME = f'model_{type_rate}'
+        model = dump.load(f'{PATH_MODEL}/{FILE_NAME}')[1]
 
-        model = dump.load('$PATH/$FILE_NAME')[1]
+        # Check
         print(colored("model loaded", "green"))
         return model
 
-    def evaluate(self, user, model):
+    def evaluate_user(self, user, model):
         """
             Make a prediction for a user based on the chosen rating and return the prediction for ALL beers
             user : TO BE DEFINED
