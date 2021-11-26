@@ -2,8 +2,11 @@ from enum import Enum, unique
 import ast
 import pandas as pd
 
+# import sys
+# sys.path.append('../raw_data/')
+
 # A changer plus tard pas propre ce truc
-file_users = 'new_users.csv'
+file_users = '../raw_data/new_users.csv'
 df_path = '../raw_data/kaggle_v2.csv'
 
 @unique
@@ -58,18 +61,14 @@ def preproc_data(df_path) -> pd.DataFrame:
 
 def load_new_users(file_name):
 	'''
-	load all the Hnad crated users from the new_users.csv
+	load all the Hand crafted users from the new_users.csv
 	'''
-    with open(file_name) as f:
-        list_new_users = []
-        for line in f:
-            temp = line.split(";")
-            list_new_users.append(new_users(
-                                            name= temp[0], 
-                                            ratings = ast.literal_eval(temp[1]), 
-                                            id =int(temp[2]))
-                                 )
-    return list_new_users
+	with open(file_name) as file:
+		list_new_users = []
+		for line in file:
+			temp = line.split(";")
+			list_new_users.append(new_users(name= temp[0], ratings = ast.literal_eval(temp[1]), id =int(temp[2])))
+	return list_new_users
 
 def create_review(beer_id : int, user : int, rating :int , df_beer ,text : str =None):
     ''' 
@@ -93,6 +92,11 @@ def create_review(beer_id : int, user : int, rating :int , df_beer ,text : str =
     return review
 
 def update_dataset(df,list_new_users):
+	"""
+	Append the reviews from the hand crafted new users
+	df : Base dat_set to be updated
+	list_new_users : result from the load_new_users function
+	"""
     list_reviews = []
     for user in list_new_users:
         for key in user.get_ratings():
@@ -110,4 +114,7 @@ if __name__ == '__main__':
     list_new_users = load_new_users(file_users)
     df = preproc_data(df_path)
     df = update_dataset(df,list_new_users)
+
+    #Add export of the dataset to a set point
+    #print(df.tail(1))
     
