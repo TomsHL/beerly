@@ -67,7 +67,7 @@ class Predictor(object):
 if __name__ == "__main__":
     
     # return prediction
-    model = load_model(rating)
-    pred = evaluate(user, model)
-    resfinal = filter_result(pred)
+    #model = load_model(rating)
+    #pred = evaluate(user, model)
+    #resfinal = filter_result(pred)
 

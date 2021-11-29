@@ -7,7 +7,7 @@ import pandas as pd
 
 # A changer plus tard pas propre ce truc
 file_users = '../raw_data/new_users.csv'
-df_path = '../raw_data/kaggle_v2.csv'
+df_path = '../raw_data/kaggle_v3.csv'
 
 @unique
 class Atrib(Enum):
@@ -22,10 +22,11 @@ class Atrib(Enum):
 
 class new_users(object):
 	"""New users for the data_base"""
-	def __init__(self, id:int , name:str, ratings: dict):
+	def __init__(self, id:int , name:str, ratings: dict, reviews=None :dict):
 		self.id = id
 		self.name = name
 		self.ratings = ratings
+		self.reviews = str(reviews)
 	
 	def get_ratings(self):
 		return self.ratings
@@ -36,27 +37,40 @@ class new_users(object):
 	def get_name(self):
 		return self.name
 
+	def get_review(self):
+		return self.reviews
+
 def preproc_data(df_path) -> pd.DataFrame:
     '''
     Preprocessing of the data frame
     df_path : full path to the data_set 
     1. fill Na with ' ' to avoid fuzzy matching pb
     2. Create the correct columns beer + brewery
-    3. NOT inplemented : Cleaning of beer with low rating count
-    4. NOT inplemented : Cleaning of beer with comment not in english
+    3. Cleaning of beer with low rating count
+    4. Cleaning of beer with comment not in english // done before just cleaning
     5. append new user 
     '''
     
-    df = pd.read_csv(df_path)
+	df = pd.read_csv(df_path)
     
     # Step 1 & 2
-    if 'beer_name' and 'brewery_name' in df:
-        df['brewery_name'].fillna(value= ' ', inplace=True )
-        df['beer_brewery'] = df['beer_name'] + ' ' + df['brewery_name']
+	if 'beer_name' and 'brewery_name' in df:
+		df['brewery_name'].fillna(value= ' ', inplace=True )
+		df['beer_brewery'] = df['beer_name'] + ' ' + df['brewery_name']
         
     else :
         return print('Wrong format of dataset')
     
+    # Step 3
+
+	beer_todrop = set(df.groupby("beer_name").filter(lambda x: len(x) <= 2)['beer_name'])
+	user_todrop = set(df.groupby("user_id").filter(lambda x: len(x) <= 2)['user_id'])
+	df = df[~df["beer_name"].isin(beer_todrop)]
+	df = df[~df["user_id"].isin(user_todrop)]
+
+    # Step 4
+    df.drop(columns='lang', inplace=True)
+
     return df
 
 def load_new_users(file_name):
@@ -115,6 +129,8 @@ if __name__ == '__main__':
     df = preproc_data(df_path)
     df = update_dataset(df,list_new_users)
 
-    #Add export of the dataset to a set point
+    # Add export of the dataset to a set point
+    # Add export of a lite dataset for Thomas
+  	# beer_name,, beer_id, beer_brewery
     #print(df.tail(1))
     
