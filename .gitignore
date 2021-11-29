@@ -8,3 +8,4 @@ raw_data/
 .env
 notebooks/
 .python-version
+test_codes/
