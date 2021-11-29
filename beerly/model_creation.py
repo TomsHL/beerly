@@ -1,6 +1,7 @@
 from surprise import SVD, Dataset, Reader, dump
 import pandas as pd
 from data_loading import Atrib
+import os
 
 path_data = "../raw_data/dataset_cleaned.csv"
 df = pd.read_csv(path_data)
@@ -23,5 +24,9 @@ def fit_export(rating_type: Atrib, df) -> None:
     print(f"{name_model} exported")
 
 if __name__ == '__main__':
+    newpath = f"../models/"
+    if not os.path.exists(newpath):
+        os.makedirs(newpath)
+
     for atrib in Atrib:
         fit_export(atrib, df)

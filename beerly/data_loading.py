@@ -149,7 +149,9 @@ def create_light_dataset(df :pd.DataFrame):
 	df_light = df[['beer_name', 'beer_brewery', 'beer_id', 'brewery_name']]
 	df_light.drop_duplicates(inplace=True)
 
-	return df_light
+	df_review = df.groupby('beer_id')['review_text'].apply(lambda x: "%s" % ' '.join(x))
+
+	return df_light, df_review
 
 if __name__ == '__main__':
 	list_new_users = load_new_users(file_users)
@@ -159,10 +161,11 @@ if __name__ == '__main__':
 	print('Preprocessing of the dataset done')
 
 	df = update_dataset(df,list_new_users)
-	df_light = create_light_dataset(df)
-	print('Update of the datset performed')
+	df_light, df_review = create_light_dataset(df)
+	print('Update of the datasets performed')
 
 	# Export of the cleaned data : TODO make the path dynamic
 	df.to_csv(path_cleaned, index=False)
 	df_light.to_csv(path_light, index=False)
+	df_review = create_light_dataset(df)
 	print('Datasets exported')
