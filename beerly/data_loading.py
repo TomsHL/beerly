@@ -10,6 +10,7 @@ file_users = '../raw_data/new_usersbis.csv'
 df_path = '../raw_data/kaggle_v3bis.csv'
 path_cleaned = '../raw_data/dataset_cleaned.csv'
 path_light = '../raw_data/dataset_light.csv'
+path_reviews = '../raw_data/dataset_reviews.csv'
 
 @unique
 class Atrib(Enum):
@@ -167,5 +168,5 @@ if __name__ == '__main__':
 	# Export of the cleaned data : TODO make the path dynamic
 	df.to_csv(path_cleaned, index=False)
 	df_light.to_csv(path_light, index=False)
-	df_review = create_light_dataset(df)
+	df_review.to_csv(path_reviews, index=False)
 	print('Datasets exported')
