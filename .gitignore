@@ -10,3 +10,4 @@ notebooks/
 .python-version
 models/
 test_codes/
+.vscode/
