@@ -150,7 +150,7 @@ def create_light_dataset(df :pd.DataFrame):
 	df_light = df[['beer_name', 'beer_brewery', 'beer_id', 'brewery_name']]
 	df_light.drop_duplicates(inplace=True)
 
-	df_review = df.groupby('beer_id')['review_text'].apply(lambda x: "%s" % ' '.join(x))
+	df_review = df.groupby('beer_id')['review_text'].apply(lambda x: "%s" % ' '.join(filter(None, x)))
 
 	return df_light, df_review
 
