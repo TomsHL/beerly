@@ -21,9 +21,13 @@ def predict_collab(beer_list: pd.DataFrame, uid, models) -> pd.DataFrame:
 
     for rating_type in Atrib:
 <<<<<<< HEAD
+<<<<<<< HEAD
         path_loading = f'/home/tom/code/TomsHL/beerly/models/model_{rating_type.val()}'
         model = dump.load(path_loading)[1]
 =======
+=======
+
+>>>>>>> 5cdecedcc538a58356616d588648afc92dbc94a0
         model = models[rating_type.val()]
 >>>>>>> 88b1ed244b15d1e421d2cb34e142e4bf8716d803
         list_note = [model.predict(uid, iid, verbose=False, clip=True)[3] for iid in beer_list['beer_id']];
