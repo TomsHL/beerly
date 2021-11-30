@@ -8,4 +8,6 @@ raw_data/
 .env
 notebooks/
 .python-version
+models/
 test_codes/
+.vscode/
