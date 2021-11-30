@@ -6,8 +6,6 @@ import pandas as pd
 from rapidfuzz import process, fuzz
 
 default_db = pd.read_csv('/home/tom/code/TomsHL/beerly/raw_data/dataset_light.csv')
-example_list_from_ocr = [
-    'kwak', 'paulaner', 'coors light', 'grimbergen blanche']
 
 def raw_extract (img_path):
     ''' raw extract from an image with tesseract'''
@@ -199,7 +197,7 @@ def fuzzy_matching(beer, df = default_db):
     # get top score beer (=> most probable match)
     return df_fuzz_gpb['beer_brewery'].iloc[0]
 
-def match_all_beers(list_from_ocr, df = default_db):
+def match_all_beers(list_from_ocr, df):
     ''' uses the fuzzy_matching function to match all beers from a list.
     Returns name_from_ocr, beer_id, beer_name'''
 
