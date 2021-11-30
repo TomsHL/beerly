@@ -229,3 +229,5 @@ def quick_preproc(df = default_db):
 if __name__ == '__main__':
     df = quick_preproc()
     print(match_all_beers(['kwak', 'paulaner', 'coors light', 'grimbergen blanche'], df))
+    match_all_beers(['kwak', 'paulaner', 'coors light', 'grimbergen blanche'],
+                    df).to_csv('test_from_ocr.csv', index = None)
