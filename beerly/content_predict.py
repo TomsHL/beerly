@@ -19,6 +19,9 @@ def predict_content(dataset: pd.core.frame.DataFrame,
 
     #Create liked, the serie containing an user's reviewed beers.
     rated = dataset[dataset.user_id == user_id].copy()
+    rated = rated.drop('review_text', axis=1).merge(dataset_reviews,
+                                                    on='beer_id',
+                                                    how='left')
     del dataset
 
     liked_df = rated[rated.overall >= 3]
