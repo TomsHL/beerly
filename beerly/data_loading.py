@@ -58,6 +58,7 @@ def preproc_data(df_path) -> pd.DataFrame:
 
 	# Step 1 & 2
 	if 'beer_name' and 'brewery_name' in df:
+		df['review_text'].fillna(value= ' ', inplace=True )
 		df['brewery_name'].fillna(value= ' ', inplace=True )
 		df['beer_brewery'] = df['beer_name'] + ' ' + df['brewery_name']
 
@@ -168,5 +169,5 @@ if __name__ == '__main__':
 	# Export of the cleaned data : TODO make the path dynamic
 	df.to_csv(path_cleaned, index=False)
 	df_light.to_csv(path_light, index=False)
-	df_review.to_csv(path_reviews, index=False)
+	df_review.to_csv(path_reviews)
 	print('Datasets exported')
