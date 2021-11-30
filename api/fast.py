@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from beerly import OCR
+from beerly import OCR, collab_predict
 
 from PIL import Image
 from pydantic import BaseModel
@@ -11,7 +11,7 @@ import pickle
 import numpy as np
 import cv2
 
-default_db = 'raw_data/df_lite.csv'
+default_db = '/home/tom/code/TomsHL/beerly/raw_data/dataset_light.csv'
 
 app = FastAPI()
 
@@ -54,6 +54,10 @@ def predict(item : Item):
     extract = OCR.raw_extract(img)
     raw_list = OCR.list_from_ocr(extract)
     beer_df = OCR.match_all_beers(raw_list, df=default_db)
-    dict_response = beer_df.to_json()
+
+    user = int(item.user)
+    ratings = collab_predict.predict_collab(beer_df, user)
+
+    dict_response = ratings.to_json()
 
     return dict_response

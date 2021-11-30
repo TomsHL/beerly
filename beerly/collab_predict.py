@@ -1,6 +1,6 @@
 import pandas as pd
 from surprise import dump
-from data_loading import Atrib
+from beerly.data_loading import Atrib
 
 def predict_collab(beer_list: pd.DataFrame, uid) -> pd.DataFrame:
     """
@@ -14,7 +14,7 @@ def predict_collab(beer_list: pd.DataFrame, uid) -> pd.DataFrame:
     beer_note.drop(columns=['name_from_ocr', 'brewery_name'], inplace=True)
 
     for rating_type in Atrib:
-        path_loading = f'../models/model_{rating_type.val()}'
+        path_loading = f'/home/tom/code/TomsHL/beerly/models/model_{rating_type.val()}'
         model = dump.load(path_loading)[1]
         list_note = [model.predict(uid, iid, verbose=False, clip=True)[3] for iid in beer_list['beer_id']];
         beer_note[f"rating_{rating_type.val()}"] = list_note

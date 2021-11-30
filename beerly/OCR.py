@@ -5,7 +5,7 @@ import cv2
 import pandas as pd
 from rapidfuzz import process, fuzz
 
-default_db = '../raw_data/df_lite.csv'
+default_db = pd.read_csv('/home/tom/code/TomsHL/beerly/raw_data/dataset_light.csv')
 example_list_from_ocr = [
     'kwak', 'paulaner', 'coors light', 'grimbergen blanche']
 
@@ -165,7 +165,7 @@ def list_from_ocr(extract):
 
 def fuzzy_matching(beer, df = default_db):
     ''' get the match of a beer in a database'''
-    df = pd.read_csv(default_db)
+    df = default_db
     # fill brewery names
     df['brewery_name'].fillna(' ', inplace=True)
 
@@ -208,11 +208,8 @@ def match_all_beers(list_from_ocr, df = default_db):
         'name_from_ocr': list_from_ocr,
         'beer_brewery': matches
     })
-
-    df_extract = df[['beer_name', 'beer_id', 'beer_brewery',
-                     'brewery_name']].drop_duplicates()
-    df_return = df_match.merge(df_extract, on = 'beer_brewery', how = 'left')
-
+    df = default_db
+    df_return = df_match.merge(df, on = 'beer_brewery', how = 'left')
 
     df_return = df_return[[
         'name_from_ocr', 'brewery_name', 'beer_name', 'beer_id'
@@ -221,7 +218,7 @@ def match_all_beers(list_from_ocr, df = default_db):
 
 def quick_preproc(df = default_db):
     ''' Preprocessing of the df for name = main'''
-    df = pd.read_csv(default_db)
+    df = default_db
     df['brewery_name'].fillna(' ', inplace = True)
     df['beer_brewery'] = df['brewery_name'] + ' - ' + df['beer_name']
     return df
