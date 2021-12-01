@@ -7,19 +7,9 @@ install_requirements:
 check_code:
 	@flake8 scripts/* beerly/*.py
 
-black:
-	@black scripts/* beerly/*.py
-
-test:
-	@coverage run -m pytest tests/*.py
-	@coverage report -m --omit="${VIRTUAL_ENV}/lib/python*"
-
-ftest:
-	@Write me
 
 clean:
 	@rm -f */version.txt
-	@rm -f .coverage
 	@rm -fr */__pycache__ */*.pyc __pycache__
 	@rm -fr build dist
 	@rm -fr beerly-*.dist-info
@@ -28,7 +18,7 @@ clean:
 install:
 	@pip install . -U
 
-all: clean install test black check_code
+all: clean install check_code
 
 count_lines:
 	@find ./ -name '*.py' -exec  wc -l {} \; | sort -n| awk \
@@ -42,18 +32,33 @@ count_lines:
 	@echo ''
 
 # ----------------------------------
-#      UPLOAD PACKAGE TO PYPI
+#         GCP API Deploy
 # ----------------------------------
-PYPI_USERNAME=<AUTHOR>
-build:
-	@python setup.py sdist bdist_wheel
+# project id
+PROJECT_ID=xxxx
 
-pypi_test:
-	@twine upload -r testpypi dist/* -u $(PYPI_USERNAME)
+build_docker:
+	-@docker build -t eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME} .
 
-pypi:
-	@twine upload dist/* -u $(PYPI_USERNAME)
+run_docker:
+#	docker run -e PORT=1234 -p 8000:1234 eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME}
+	docker run -e PORT=8000 -p 8080:8000 beerly0
+run_it:
+	docker run -it -e PORT=1234 -p 8000:1234 eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME} sh
 
+push_docker:
+	-@docker push eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME}
+
+configure_api:
+	gcloud config set project ${PROJECT_ID}
+
+deploy_api:
+	-@gcloud run deploy \
+			--image eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME} \
+			--platform managed \
+			--region europe-west1 \
+			--set-env-vars "GOOGLE_APPLICATION_CREDENTIALS=/credentials.json" \
+			--memory '4Gi'
 
 # ----------------------------------
 #             API

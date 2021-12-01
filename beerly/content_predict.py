@@ -6,6 +6,19 @@ from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
 def predict_content(dataset: pd.core.frame.DataFrame,
                     dataset_reviews: pd.core.frame.DataFrame,
                     menu_ocr: pd.core.frame.DataFrame, user_id: int):
+    '''Return a similarity score between two set of beers.
+    One from a menu screened by OCR and the other parsed from the user reviewed beers
+
+    Args:
+        dataset (DataFrame): reviews of beer.
+        dataset_reviews (DataFrame): beers grouped by beer_id
+        menu_ocr (DataFrame): Output from OCR screening
+        user_id (int): id of user
+
+    Returns:
+        Serie: menu beers ranked by similarity.
+
+    '''
 
     #creation of the menu serie mixing beer_id from ocr and matching reviews from beers
     beers_df = dataset_reviews.copy()

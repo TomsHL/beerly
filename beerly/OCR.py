@@ -1,10 +1,9 @@
-import pytesseract
 import re
-
+from joblib import Parallel, delayed
+import pytesseract
 import pandas as pd
 from rapidfuzz import process, fuzz
 
-# default_db = pd.read_csv('raw_data/dataset_light.csv')
 
 def raw_extract (img):
     ''' raw extract from an image with tesseract'''
@@ -196,11 +195,13 @@ def match_all_beers(list_from_ocr, df):
     ''' uses the fuzzy_matching function to match all beers from a list.
     Returns name_from_ocr, beer_id, beer_name'''
 
-    matches = [fuzzy_matching(beer, df) for beer in list_from_ocr]
+    matches = Parallel(n_jobs=-1)(delayed(fuzzy_matching)(beer, df)  for beer in list_from_ocr)
+
     df_match = pd.DataFrame({
         'name_from_ocr': list_from_ocr,
         'beer_brewery': matches
     })
+
     df_return = df_match.merge(df, on = 'beer_brewery', how = 'left')
 
     df_return = df_return[[
@@ -208,15 +209,5 @@ def match_all_beers(list_from_ocr, df):
     ]]
     return df_return
 
-def quick_preproc(df):
-    ''' Preprocessing of the df for name = main'''
-    df['brewery_name'].fillna(' ', inplace = True)
-    df['beer_brewery'] = df['brewery_name'] + ' - ' + df['beer_name']
-    return df
-
 if __name__ == '__main__':
-    default_db = pd.read_csv('raw_data/dataset_light.csv')
-    df = quick_preproc(default_db)
-    print(match_all_beers(['kwak', 'paulaner', 'coors light', 'grimbergen blanche'], df))
-    match_all_beers(['kwak', 'paulaner', 'coors light', 'grimbergen blanche'],
-                    df).to_csv('test_from_ocr.csv', index = None)
+  pass

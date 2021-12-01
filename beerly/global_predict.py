@@ -1,7 +1,4 @@
 import pandas as pd
-import numpy as np
-
-# from collab_predict import predict_collab
 from beerly.data_loading import Atrib
 
 def global_pred(
