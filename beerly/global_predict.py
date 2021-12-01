@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 
 # from collab_predict import predict_collab
 from data_loading import Atrib
