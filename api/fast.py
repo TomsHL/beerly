@@ -1,4 +1,3 @@
-import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
@@ -67,37 +66,31 @@ def predict(item: Item):
         'overall': item.overall ,
         'content': item.content
     }
-    t = time.time()
-    times= {}
-
-    times.update({'start': 0})
 
     # decode base64-formatted image from front-end
     decoded_string = base64.b64decode(bytes(item.image, 'utf-8'))
     img = np.frombuffer(decoded_string, dtype='uint8')
 
-    times.update({'decode': time.time()-t})
-
     img = img.reshape((item.height, item.width, item.channel))
     img = Image.fromarray(img)
 
     extract = OCR.raw_extract(img)
-    times.update( {'raw_extract': time.time()-t})
+
     raw_list = OCR.list_from_ocr(extract)
-    times.update( {'list_from': time.time()-t})
+
     beer_df = OCR.match_all_beers(raw_list, df=default_db)
-    times.update( {'match_all': time.time()-t})
+
     # apply recommendation methods
     user = int(item.user)
     collab = collab_predict.predict_collab(beer_df, user, models)
-    times.update( {'collab': time.time()-t})
+
     content = content_predict.predict_content(dataset, dataset_reviews,
                                               beer_df, user)
-    times.update( {'content': time.time()-t})
+
     glob = global_predict.global_pred(collab, content, mix_params)
-    times.update( {'gloabl': time.time()-t})
+
     # send back the df with beers and ratings
     dict_response = glob.to_json()
-    times.update( {'end': time.time()-t})
-    print(times)
+
+
     return dict_response
