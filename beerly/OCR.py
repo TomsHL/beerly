@@ -5,15 +5,10 @@ import cv2
 import pandas as pd
 from rapidfuzz import process, fuzz
 
-default_db = '../raw_data/df_lite.csv'
-example_list_from_ocr = [
-    'kwak', 'paulaner', 'coors light', 'grimbergen blanche']
+default_db = pd.read_csv('/home/tom/code/TomsHL/beerly/raw_data/dataset_light.csv')
 
-def raw_extract (img_path):
+def raw_extract (img):
     ''' raw extract from an image with tesseract'''
-
-    img = cv2.imread(img_path,
-                    cv2.IMREAD_COLOR)
 
     extract = pytesseract.image_to_string(img)
     return extract
@@ -165,7 +160,7 @@ def list_from_ocr(extract):
 
 def fuzzy_matching(beer, df = default_db):
     ''' get the match of a beer in a database'''
-    df = pd.read_csv(default_db)
+    df = default_db
     # fill brewery names
     df['brewery_name'].fillna(' ', inplace=True)
 
@@ -199,7 +194,7 @@ def fuzzy_matching(beer, df = default_db):
     # get top score beer (=> most probable match)
     return df_fuzz_gpb['beer_brewery'].iloc[0]
 
-def match_all_beers(list_from_ocr, df = default_db):
+def match_all_beers(list_from_ocr, df):
     ''' uses the fuzzy_matching function to match all beers from a list.
     Returns name_from_ocr, beer_id, beer_name'''
 
@@ -208,11 +203,8 @@ def match_all_beers(list_from_ocr, df = default_db):
         'name_from_ocr': list_from_ocr,
         'beer_brewery': matches
     })
-
-    df_extract = df[['beer_name', 'beer_id', 'beer_brewery',
-                     'brewery_name']].drop_duplicates()
-    df_return = df_match.merge(df_extract, on = 'beer_brewery', how = 'left')
-
+    df = default_db
+    df_return = df_match.merge(df, on = 'beer_brewery', how = 'left')
 
     df_return = df_return[[
         'name_from_ocr', 'brewery_name', 'beer_name', 'beer_id'
@@ -221,7 +213,7 @@ def match_all_beers(list_from_ocr, df = default_db):
 
 def quick_preproc(df = default_db):
     ''' Preprocessing of the df for name = main'''
-    df = pd.read_csv(default_db)
+    df = default_db
     df['brewery_name'].fillna(' ', inplace = True)
     df['beer_brewery'] = df['brewery_name'] + ' - ' + df['beer_name']
     return df
@@ -229,3 +221,5 @@ def quick_preproc(df = default_db):
 if __name__ == '__main__':
     df = quick_preproc()
     print(match_all_beers(['kwak', 'paulaner', 'coors light', 'grimbergen blanche'], df))
+    match_all_beers(['kwak', 'paulaner', 'coors light', 'grimbergen blanche'],
+                    df).to_csv('test_from_ocr.csv', index = None)
