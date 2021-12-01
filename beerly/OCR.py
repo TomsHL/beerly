@@ -7,11 +7,8 @@ from rapidfuzz import process, fuzz
 
 default_db = pd.read_csv('/home/tom/code/TomsHL/beerly/raw_data/dataset_light.csv')
 
-def raw_extract (img_path):
+def raw_extract (img):
     ''' raw extract from an image with tesseract'''
-
-    img = cv2.imread(img_path,
-                    cv2.IMREAD_COLOR)
 
     extract = pytesseract.image_to_string(img)
     return extract

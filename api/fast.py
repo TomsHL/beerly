@@ -40,6 +40,7 @@ class Item(BaseModel):
     height: int
     width: int
     channel: int
+    taste : float
     appearance: float
     palate: float
     aroma: float
@@ -79,7 +80,7 @@ def predict(item: Item):
     user = int(item.user)
     collab = collab_predict.predict_collab(beer_df, user, models)
     content = content_predict.predict_content(dataset, dataset_reviews,
-                                              beer_df)
+                                              beer_df, user)
     glob = global_predict.global_pred(collab, content, mix_params)
 
     # send back the df with beers and ratings
