@@ -111,6 +111,8 @@ def list_from_ocr(extract):
     stop = indices_stop[0] + start - 1
 
     extract_lines_stripped = extract_lines_acc[start:stop]
+    if len(extract_lines_stripped) == 0:
+        extract_lines_stripped = extract_lines_acc[start:-1]
 
     # remove general keywords (bière locale, bière pression, bière bouteille, bière de saison)
     exc_list = [
@@ -207,6 +209,7 @@ def match_all_beers(list_from_ocr, df):
     df_return = df_return[[
         'name_from_ocr', 'brewery_name', 'beer_name', 'beer_id'
     ]]
+    print(df_return)
     return df_return
 
 if __name__ == '__main__':
