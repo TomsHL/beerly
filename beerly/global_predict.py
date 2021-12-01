@@ -1,7 +1,7 @@
 import pandas as pd
 
 # from collab_predict import predict_collab
-from data_loading import Atrib
+from beerly.data_loading import Atrib
 
 def global_pred(
     result_collab: pd.DataFrame,
@@ -28,5 +28,6 @@ def global_pred(
         by=["ranking"], ascending=False, ignore_index=True, inplace=True
     )
 
+    return beer_ranking
 if __name__ == "__main__":
     pass
