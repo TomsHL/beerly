@@ -5,7 +5,7 @@ import cv2
 import pandas as pd
 from rapidfuzz import process, fuzz
 
-default_db = pd.read_csv('/home/tom/code/TomsHL/beerly/raw_data/dataset_light.csv')
+default_db = pd.read_csv('raw_data/dataset_light.csv')
 
 def raw_extract (img):
     ''' raw extract from an image with tesseract'''
