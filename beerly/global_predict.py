@@ -29,5 +29,6 @@ def global_pred(
         by=["ranking"], ascending=False, ignore_index=True, inplace=True
     )
 
+    return beer_ranking
 if __name__ == "__main__":
     pass
