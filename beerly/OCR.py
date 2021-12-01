@@ -1,8 +1,6 @@
 import re
 from joblib import Parallel, delayed
 import pytesseract
-
-
 import pandas as pd
 from rapidfuzz import process, fuzz
 
@@ -197,7 +195,6 @@ def match_all_beers(list_from_ocr, df):
     ''' uses the fuzzy_matching function to match all beers from a list.
     Returns name_from_ocr, beer_id, beer_name'''
 
-    #matches = [fuzzy_matching(beer, df) for beer in list_from_ocr]
     matches = Parallel(n_jobs=-1)(delayed(fuzzy_matching)(beer, df)  for beer in list_from_ocr)
 
     df_match = pd.DataFrame({
@@ -212,11 +209,5 @@ def match_all_beers(list_from_ocr, df):
     ]]
     return df_return
 
-def quick_preproc(df):
-    ''' Preprocessing of the df for name = main'''
-    df['brewery_name'].fillna(' ', inplace = True)
-    df['beer_brewery'] = df['brewery_name'] + ' - ' + df['beer_name']
-    return df
-
 if __name__ == '__main__':
-    pass
+  pass
