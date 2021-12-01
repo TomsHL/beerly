@@ -35,30 +35,31 @@ count_lines:
 #         GCP API Deploy
 # ----------------------------------
 # project id
-PROJECT_ID=xxxx
+PROJECT_ID=beerly-89000
+DOCKER_IMAGE_NAME=beerly0
+GCR_MULTI_REGION="eu.gcr.io"
 
 build_docker:
-	-@docker build -t eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME} .
+	-@docker build -t ${GCR_MULTI_REGION}/${PROJECT_ID}/${DOCKER_IMAGE_NAME} .
 
 run_docker:
-#	docker run -e PORT=1234 -p 8000:1234 eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME}
-	docker run -e PORT=8000 -p 8080:8000 beerly0
+	-@docker run -e PORT=1234 -p 8080:8000 ${GCR_MULTI_REGION}/${PROJECT_ID}/${DOCKER_IMAGE_NAME}
 run_it:
-	docker run -it -e PORT=1234 -p 8000:1234 eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME} sh
+	-@docker run -it -e PORT=1234 -p 8000:1234 eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME} sh
 
 push_docker:
-	-@docker push eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME}
+	-@docker ${GCR_MULTI_REGION}/${PROJECT_ID}/${DOCKER_IMAGE_NAME}
 
 configure_api:
 	gcloud config set project ${PROJECT_ID}
 
 deploy_api:
 	-@gcloud run deploy \
-			--image eu.gcr.io/${PROJECT_ID}/${DOCKER_IMAGE_NAME} \
+			--image ${GCR_MULTI_REGION}/${PROJECT_ID}/${DOCKER_IMAGE_NAME} \
 			--platform managed \
-			--region europe-west1 \
+			--region $GCR_MULTI_REGION \
 			--set-env-vars "GOOGLE_APPLICATION_CREDENTIALS=/credentials.json" \
-			--memory '4Gi'
+			--memory '16Gi'
 
 # ----------------------------------
 #             API
