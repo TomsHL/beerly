@@ -26,6 +26,6 @@ def global_pred(
         by=["ranking"], ascending=False, ignore_index=True, inplace=True
     )
 
-    return beer_ranking
+    return beer_ranking.drop_duplicates()
 if __name__ == "__main__":
     pass

@@ -1,3 +1,4 @@
+from os import times
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
@@ -10,8 +11,9 @@ import base64
 import numpy as np
 import pandas as pd
 
+
 # Preload datasets and models to speed up API calls
-default_db = pd.read_csv('raw_data/dataset_light.csv')
+default_db = pd.read_csv('raw_data/dataset_light10.csv')
 dataset = pd.read_csv('raw_data/dataset_cleaned.csv')
 dataset_reviews = pd.read_csv('raw_data/dataset_reviews.csv')
 
@@ -67,6 +69,7 @@ def predict(item: Item):
         'content': item.content
     }
 
+
     # decode base64-formatted image from front-end
     decoded_string = base64.b64decode(bytes(item.image, 'utf-8'))
     img = np.frombuffer(decoded_string, dtype='uint8')
@@ -85,12 +88,11 @@ def predict(item: Item):
     collab = collab_predict.predict_collab(beer_df, user, models)
 
     content = content_predict.predict_content(dataset, dataset_reviews,
-                                              beer_df, user)
+                                              beer_df, user,40_000)
 
     glob = global_predict.global_pred(collab, content, mix_params)
 
     # send back the df with beers and ratings
     dict_response = glob.to_json()
-
 
     return dict_response
