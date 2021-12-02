@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
 
 def predict_content(dataset: pd.core.frame.DataFrame,
                     dataset_reviews: pd.core.frame.DataFrame,
-                    menu_ocr: pd.core.frame.DataFrame, user_id: int):
+                    menu_ocr: pd.core.frame.DataFrame, user_id: int, review_size:int=0):
     '''Return a similarity score between two set of beers.
     One from a menu screened by OCR and the other parsed from the user reviewed beers
 
@@ -14,36 +14,26 @@ def predict_content(dataset: pd.core.frame.DataFrame,
         dataset_reviews (DataFrame): beers grouped by beer_id
         menu_ocr (DataFrame): Output from OCR screening
         user_id (int): id of user
+        review_size (int): number of words to keep for each review, the lower the faster the prediction is.
 
     Returns:
         Serie: menu beers ranked by similarity.
-
     '''
 
     #creation of the menu serie mixing beer_id from ocr and matching reviews from beers
-    beers_df = dataset_reviews.copy()
-    beers_df.set_index(beers_df['beer_id'], drop=False, inplace=True)
-    beers = beers_df.review_text
+
+    dataset_reviews.set_index(dataset_reviews['beer_id'], drop=False, inplace=True)
+    beers = dataset_reviews.review_text
 
     menu = beers[beers.index.isin(menu_ocr.beer_id)]
     m = menu.size
 
-    del beers_df, beers, menu_ocr
+    del dataset_reviews, menu_ocr
 
     #Create liked, the serie containing an user's reviewed beers.
-    rated = dataset[dataset.user_id == user_id].copy()
-    rated = rated.drop('review_text', axis=1).merge(dataset_reviews,
-                                                    on='beer_id',
-                                                    how='left')
-    del dataset
-
-    liked_df = rated[rated.overall >= 3]
-    if (liked_df['beer_id'].duplicated().sum()):
-        liked = liked_df.groupby('beer_id')['review_text'].apply(
-            lambda x: "%s" % ' '.join(x))
-    else:
-        liked = liked_df.set_index(liked_df.beer_id, drop=True)['review_text']
-    del liked_df
+    rated = dataset[(dataset.user_id == user_id) & (dataset.overall > 3) ]['beer_id']
+    liked = beers.loc[rated]
+    del beers, rated
 
     #Vectorizing
     custom_words = frozenset([
@@ -53,6 +43,10 @@ def predict_content(dataset: pd.core.frame.DataFrame,
     stop_words = ENGLISH_STOP_WORDS.union(custom_words)
 
     payload = pd.concat([menu, liked])
+
+    if(review_size):
+        payload = payload.apply(lambda s : s[:review_size])
+
     vectorizer = CountVectorizer(stop_words=stop_words,
                                  min_df=5,
                                  max_df=40,

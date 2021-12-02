@@ -4,10 +4,8 @@ import pytesseract
 import pandas as pd
 from rapidfuzz import process, fuzz
 
-
 def raw_extract (img):
     ''' raw extract from an image with tesseract'''
-
     extract = pytesseract.image_to_string(img)
     return extract
 
@@ -158,26 +156,25 @@ def list_from_ocr(extract):
 
     return extract_beers
 
-def fuzzy_matching(beer, df):
+def fuzzy_matching(beer, df, choices):
     ''' get the match of a beer in a database'''
     # fill brewery names
     df['brewery_name'].fillna(' ', inplace=True)
-
     # set 3 fuzzy scorers
-    choices = df['beer_brewery'].unique()
+
     s1 = process.extract(beer,
                          choices,
-                         limit=15,
+                         limit=5,
                          scorer=fuzz.partial_ratio)
 
     s2 = process.extract(beer,
                          choices,
-                         limit=15,
+                         limit=5,
                          scorer=fuzz.partial_token_set_ratio)
 
     s3 = process.extract(beer,
                          choices,
-                         limit=15,
+                         limit=5,
                          scorer=fuzz.token_set_ratio)
 
     # create a df with the results of the 3 scorers, sum scores per beer
@@ -197,7 +194,8 @@ def match_all_beers(list_from_ocr, df):
     ''' uses the fuzzy_matching function to match all beers from a list.
     Returns name_from_ocr, beer_id, beer_name'''
 
-    matches = Parallel(n_jobs=-1)(delayed(fuzzy_matching)(beer, df)  for beer in list_from_ocr)
+    choices = df['beer_brewery'].unique()
+    matches = Parallel(n_jobs=-1)(delayed(fuzzy_matching)(beer, df, choices)  for beer in list_from_ocr)
 
     df_match = pd.DataFrame({
         'name_from_ocr': list_from_ocr,
@@ -209,8 +207,7 @@ def match_all_beers(list_from_ocr, df):
     df_return = df_return[[
         'name_from_ocr', 'brewery_name', 'beer_name', 'beer_id'
     ]]
-    print(df_return)
-    return df_return
+    return df_return.drop_duplicates()
 
 if __name__ == '__main__':
   pass
